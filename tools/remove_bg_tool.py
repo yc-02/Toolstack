@@ -4,7 +4,6 @@ from typing import Tuple
 from PIL import Image, ImageOps, ImageFilter
 from rembg import remove as rembg_remove, new_session
 
-# cache sessions per (model_name)
 _sessions = {}
 
 def get_session(model_name: str = "u2net"):  # default to faster model
@@ -45,12 +44,7 @@ def remove_bg(
     longest_side_in: int = 1280,  # *** preprocess cap BEFORE rembg ***
     png_compress_level: int = 6,  # 0=fastest, 9=smallest
 ) -> Tuple[bytes, Image.Image]:
-    """
-    Speed-optimized background removal.
-    - Pre-downscales input to reduce compute (longest_side_in).
-    - Optional alpha-matting via `quality="high"`.
-    - Caps output width with `max_width` (no upscaling).
-    """
+
     # 1) Pre-downscale to cut inference time massively
     pre_bytes = _pre_downscale(raw_bytes, longest=longest_side_in)
 

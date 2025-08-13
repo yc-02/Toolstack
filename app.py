@@ -3,6 +3,49 @@ import os
 import shutil
 import subprocess
 import streamlit as st
+
+st.set_page_config(page_title="Toolstack", page_icon="favicon.ico", layout="wide")
+
+NODE_PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+PKG_JSON = os.path.join(NODE_PROJECT_DIR, "package.json")
+PKG_LOCK = os.path.join(NODE_PROJECT_DIR, "package-lock.json")
+NODE_MODULES = os.path.join(NODE_PROJECT_DIR, "node_modules")
+
+
+def ensure_node_deps() -> bool:
+    if shutil.which("node") is None or shutil.which("npm") is None:
+        st.error(
+            "Node.js/npm are not available."
+        )
+        return False
+
+    if not os.path.exists(PKG_JSON):
+        st.error(f"`package.json` not found at: {PKG_JSON}")
+        return False
+
+
+    need_install = (not os.path.isdir(NODE_MODULES)) or (not os.listdir(NODE_MODULES))
+    if need_install:
+        with st.status("Installing Node dependencies…", expanded=True) as status:
+            try:
+                if os.path.exists(PKG_LOCK):
+                    cmd = ["npm", "ci", "--omit=dev"]
+                else:
+                    cmd = ["npm", "install", "--omit=dev"]
+                st.write("Running:", " ".join(cmd))
+                subprocess.run(cmd, cwd=NODE_PROJECT_DIR, check=True)
+                status.update(label="Node dependencies installed", state="complete")
+            except subprocess.CalledProcessError as e:
+                st.error("Failed to install Node packages. Check app logs for details.")
+                print("[npm-install ERROR]", e)
+                return False
+    return True
+
+
+if not ensure_node_deps():
+    st.stop()
+
+
 from components.session import sessions
 from components.sidebar import sidebar
 from components.image_format_converter_section import image_format_converter_section
@@ -12,35 +55,6 @@ from components.pick_color_section import pick_color_section
 from components.data_format_converter_section import data_format_converter_section
 from components.extract_pdf_tables_section import extract_pdf_tables_section
 
-
-NODE_PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
-PKG_JSON = os.path.join(NODE_PROJECT_DIR, "package.json")
-NODE_MODULES = os.path.join(NODE_PROJECT_DIR, "node_modules")
-
-
-def ensure_node_deps():
-    if shutil.which("npm") is None:
-        st.error(
-            "npm is not installed"
-        )
-        return False
-    if not os.path.exists(PKG_JSON):
-        st.error(f"No package.json found at {PKG_JSON}")
-        return False
-    if not os.path.isdir(NODE_MODULES) or not os.listdir(NODE_MODULES):
-        with st.status("Installing Node dependencies…", expanded=True) as status:
-            subprocess.run(
-                ["npm", "ci", "--omit=dev"], cwd=NODE_PROJECT_DIR, check=True
-            )
-            status.update(label="Node dependencies installed", state="complete")
-    return True
-
-
-if not ensure_node_deps():
-    st.stop()
-
-
-st.set_page_config(page_title="Toolstack", page_icon="favicon.ico", layout="wide")
 sessions()
 sidebar()
 

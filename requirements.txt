@@ -2,7 +2,7 @@ pandas==2.3.1
 pdfplumber==0.11.7
 Pillow==11.3.0
 pillow_heif==1.1.0
-rembg==2.0.67
+rembg>=2.0.57
 streamlit==1.48.0
 streamlit_image_coordinates==0.4.0
 onnxruntime
