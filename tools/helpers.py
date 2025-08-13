@@ -1,6 +1,7 @@
 # helpers.py
 import os, subprocess, tempfile, shutil
 from concurrent.futures import ThreadPoolExecutor
+from io import BytesIO
 
 _executor = ThreadPoolExecutor(max_workers=1)
 
@@ -9,9 +10,17 @@ def run_in_thread(fn, *args, **kwargs):
     """Run a blocking function in a background thread and return a Future."""
     return _executor.submit(fn, *args, **kwargs)
 
+
 # ---------------- Node imagetracer bridge ----------------
 def have_node() -> bool:
     return shutil.which("node") is not None
+
+
+def bytesio_with_name(raw: bytes, name: str) -> BytesIO:
+    bio = BytesIO(raw)
+    bio.name = name
+    bio.seek(0)
+    return bio
 
 
 def path_convert_mjs() -> str:

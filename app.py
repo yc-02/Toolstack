@@ -7,6 +7,8 @@ from components.bg_remover_section import bg_remover_section
 from components.png2svg_section import png2svg_section
 from components.pick_color_section import pick_color_section
 from components.data_format_converter_section import data_format_converter_section
+from components.extract_pdf_tables_section import extract_pdf_tables_section
+
 st.set_page_config(page_title="Toolstack", page_icon="", layout="wide")
 sessions()
 sidebar()
@@ -24,10 +26,8 @@ if tool == "intro":
 elif tool == "Image Format Converter":
     image_format_converter_section()
 
-
 elif tool == "Background Remover":
     bg_remover_section()
-
 
 elif tool == "PNG → SVG":
     png2svg_section()
@@ -39,4 +39,4 @@ elif tool == "Data Format Converter":
     data_format_converter_section()
 
 elif tool == "Extract PDF Tables":
-    print("something")
+    extract_pdf_tables_section()

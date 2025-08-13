@@ -41,7 +41,7 @@ def bg_remover_section():
 
     has_files = bool(files)
     has_results = bool(st.session_state["bg_results"])
-    col1, col2, _spacer = st.columns([1, 2, 7])
+    col1, col2, _spacer = st.columns([1, 2, 6])
     with col1:
         rerun_clicked = st.button(
             "Run Again",
@@ -78,7 +78,7 @@ def bg_remover_section():
                 future = run_in_thread(remove_bg, raw, max_width)
                 pct = 10
                 while not future.done():
-                    pct = min(pct + 2, 98)
+                    pct = min(pct + 2, 90)
                     progress.progress(pct, text="Running rembg…")
                     time.sleep(0.05)
 
@@ -113,7 +113,7 @@ def bg_remover_section():
         clear_bg()
     if st.session_state.bg_results:
         for i, r in enumerate(st.session_state.bg_results, start=1):
-            col1, col2 = st.columns([3, 1])
+            col1, col2 = st.columns([4, 1])
             with col1:
                 st.subheader(f"{i}. {r['name']}")
                 st.caption(f"{r['width']} × {r['height']} px")

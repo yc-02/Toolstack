@@ -45,7 +45,7 @@ def image_format_converter_section():
 
     has_files = bool(files)
     has_results = bool(st.session_state["image_results"])
-    col1, col2, _ = st.columns([1, 2, 7])
+    col1, col2, _ = st.columns([1, 2, 6])
     with col1:
         rerun_clicked = st.button(
             "Run Again",
@@ -60,7 +60,7 @@ def image_format_converter_section():
             disabled=not (has_files or has_results),
             use_container_width=True,
         )
-        
+
     # helpers to map formats to extensions/mimes
     ext_map = {"png": "png", "jpeg": "jpg", "webp": "webp", "heif": "heic"}
     mime_map = {
@@ -142,7 +142,7 @@ def image_format_converter_section():
         clear_images()
     if st.session_state.image_results:
         for i, r in enumerate(st.session_state.image_results, start=1):
-            col1, col2 = st.columns([3, 1])
+            col1, col2 = st.columns([4, 1])
             with col1:
                 st.subheader(f"{i}. {r['name']}")
                 st.caption(f"{r['width']} × {r['height']} px")

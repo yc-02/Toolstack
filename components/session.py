@@ -8,7 +8,7 @@ def sessions():
         st.session_state.tool = "intro"
 
     if "file_results" not in st.session_state:
-        st.file_results = []
+        st.session_state.file_results = []
     if "file_key" not in st.session_state:
         st.session_state.file_key = "file-uploader-0"
 

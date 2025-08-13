@@ -1,8 +1,8 @@
 # data_format_converter_section.py
 import time
-from io import BytesIO
 import streamlit as st
 from tools.data_fomat_converter_tool import data_format_converter
+from tools.helpers import bytesio_with_name
 
 try:
     from tools.helpers import run_in_thread
@@ -14,13 +14,6 @@ except Exception:
     def run_in_thread(fn, *args, **kwargs):
         return _EXEC.submit(fn, *args, **kwargs)
 
-
-
-def _bytesio_with_name(raw: bytes, name: str) -> BytesIO:
-    bio = BytesIO(raw)
-    bio.name = name
-    bio.seek(0)
-    return bio
 
 
 def data_format_converter_section():
@@ -73,7 +66,6 @@ def data_format_converter_section():
     def run_files():
         if files:
             total = len(files)
-            print(f"total files {total}")
             status = st.empty()
 
             for idx, f in enumerate(files, start=1):
@@ -82,8 +74,7 @@ def data_format_converter_section():
                 status.markdown(f"**Converting {idx}/{total}:** {f.name}")
                 progress = st.progress(0, text="Starting…")
 
-                # Build a fresh file-like for the converter (with a name and pointer at 0)
-                file_like = _bytesio_with_name(raw, f.name)
+                file_like = bytesio_with_name(raw, f.name)
 
                 future = run_in_thread(data_format_converter, to_format, file_like)
                 pct = 10
