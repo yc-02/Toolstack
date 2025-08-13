@@ -1,4 +1,6 @@
 # app.py
+import os
+import subprocess
 import streamlit as st
 from components.session import sessions
 from components.sidebar import sidebar
@@ -8,6 +10,12 @@ from components.png2svg_section import png2svg_section
 from components.pick_color_section import pick_color_section
 from components.data_format_converter_section import data_format_converter_section
 from components.extract_pdf_tables_section import extract_pdf_tables_section
+
+NODE_PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+node_modules_path = os.path.join(NODE_PROJECT_DIR, "node_modules")
+if not os.path.exists(node_modules_path):
+    st.write("Installing Node dependencies...")
+    subprocess.run(["npm", "install"], cwd=NODE_PROJECT_DIR, check=True)
 
 st.set_page_config(page_title="Toolstack", page_icon="favicon.ico", layout="wide")
 sessions()

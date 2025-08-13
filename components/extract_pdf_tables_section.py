@@ -18,7 +18,7 @@ except Exception:
 
 
 def extract_pdf_tables_section():
-    st.title("Data Format Converter")
+    st.title("Extract PDF Tables")
 
     # --- Upload
     files = st.file_uploader(

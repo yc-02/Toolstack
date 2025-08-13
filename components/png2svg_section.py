@@ -20,7 +20,7 @@ except Exception:
 
 def png2svg_section():
 
-    st.title("PNG → SVG")
+    st.title("PNG to SVG")
     if not have_node():
         st.warning("Node.js not found on PATH.")
 
