@@ -3,12 +3,29 @@ import streamlit as st
 
 
 def sidebar():
-    st.sidebar.title("Images")
-
     def set_tool(name: str):
         st.session_state.tool = name
 
-    # Image Format Converter
+    # ---- data ----
+    st.sidebar.title("Data")
+
+    st.sidebar.button(
+        "Data Format Converter",
+        use_container_width=True,
+        on_click=set_tool,
+        args=("Data Format Converter",),
+    )
+
+    st.sidebar.button(
+        "Extract PDF Tables",
+        use_container_width=True,
+        on_click=set_tool,
+        args=("Extract PDF Tables",),
+    )
+
+    # ---- Images -----
+    st.sidebar.title("Images")
+
     st.sidebar.button(
         "Image Format Converter",
         use_container_width=True,
@@ -34,29 +51,7 @@ def sidebar():
         args=("Background Remover",),
     )
 
-    st.sidebar.title("Files")
-    # txt to csv
-    # txt to excel
-    # txt to pdf
-    # csv to excel
-    # csv to pdf
-    # csv to json
-    # txt, csv, pdf, excel, json
-
-    st.sidebar.button(
-        "Data Format Converter",
-        use_container_width=True,
-        on_click=set_tool,
-        args=("Data Format Converter",),
-    )
-
-    st.sidebar.button(
-        "File Size Reducer",
-        use_container_width=True,
-        on_click=set_tool,
-        args=("File Size Reducer",),
-    )
-
+    # -- caption --
     if st.session_state.tool != "intro":
         st.sidebar.markdown("---")
         st.sidebar.caption(f"Active tool: **{st.session_state.tool}**")

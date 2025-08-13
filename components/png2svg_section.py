@@ -3,7 +3,12 @@ import time
 import streamlit as st
 
 try:
-    from tools.helpers import run_in_thread, embed_svg, trace_with_imagetracer_node, have_node
+    from tools.helpers import (
+        run_in_thread,
+        embed_svg,
+        trace_with_imagetracer_node,
+        have_node,
+    )
 except Exception:
     import concurrent.futures
 
@@ -17,9 +22,7 @@ def png2svg_section():
 
     st.title("PNG → SVG")
     if not have_node():
-        st.warning(
-            "Node.js not found on PATH. Please install Node to use the ImageTracer engine.\n`brew install node` (macOS) or from nodejs.org."
-        )
+        st.warning("Node.js not found on PATH.")
 
     # Options
     colA, colB, colC = st.columns(3)
@@ -61,9 +64,7 @@ def png2svg_section():
 
     def clear_svg():
         st.session_state["svg_results"] = []
-        st.session_state["svg_key"] = (
-            f"sbg-uploader-{time.time()}"  # reset uploader so files clear
-        )
+        st.session_state["svg_key"] = f"sbg-uploader-{time.time()}"
         st.rerun()
 
     def run_svg():

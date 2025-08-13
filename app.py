@@ -6,31 +6,37 @@ from components.image_format_converter_section import image_format_converter_sec
 from components.bg_remover_section import bg_remover_section
 from components.png2svg_section import png2svg_section
 from components.pick_color_section import pick_color_section
-
+from components.data_format_converter_section import data_format_converter_section
 st.set_page_config(page_title="Toolstack", page_icon="", layout="wide")
 sessions()
 sidebar()
 
 tool = st.session_state.tool
 if tool == "intro":
-    st.title("Select a tool")
-    st.info("Select a tool you want to use from the left panel")
+    st.title("Toolstack")
+    st.markdown(
+        "### Welcome!\n"
+        "Pick a tool from the **sidebar** on the left to get started.\n"
+    )
+    st.info("➡️ Use the left panel to explore available tools.")
 
-#  Image format converter
+
 elif tool == "Image Format Converter":
     image_format_converter_section()
 
-# Background Remover
+
 elif tool == "Background Remover":
     bg_remover_section()
 
-# PNG → SVG (Node imagetracer)
+
 elif tool == "PNG → SVG":
     png2svg_section()
 
 elif tool == "Click-to-pick color":
     pick_color_section()
 
-elif tool == "File Converter":
-    st.title("File Converter (coming soon)")
-    st.info("Convert TXT ↔ CSV and more, right in the browser.")
+elif tool == "Data Format Converter":
+    data_format_converter_section()
+
+elif tool == "Extract PDF Tables":
+    print("something")

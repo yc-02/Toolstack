@@ -17,7 +17,6 @@ except Exception:
         return _EXEC.submit(fn, *args, **kwargs)
 
 
-
 def image_format_converter_section():
     st.title("Image Format Converter")
 
@@ -49,14 +48,19 @@ def image_format_converter_section():
     col1, col2, _ = st.columns([1, 2, 7])
     with col1:
         rerun_clicked = st.button(
-            "Run Again", key="rerun-image", disabled=not (has_files)
+            "Run Again",
+            key="rerun-image",
+            disabled=not (has_files),
+            use_container_width=True,
         )
     with col2:
         clear_clicked = st.button(
             "Clear uploads/results",
             key="clear-image",
             disabled=not (has_files or has_results),
+            use_container_width=True,
         )
+        
     # helpers to map formats to extensions/mimes
     ext_map = {"png": "png", "jpeg": "jpg", "webp": "webp", "heif": "heic"}
     mime_map = {
@@ -76,57 +80,58 @@ def image_format_converter_section():
     def run_images():
         if files:
             total = len(files)
-        status_placeholder = st.empty()
+            status_placeholder = st.empty()
 
-        for idx, f in enumerate(files, start=1):
-            raw = f.read()
-            status_placeholder.markdown(f"**Converting {idx} / {total}:** {f.name}")
+            for idx, f in enumerate(files, start=1):
+                raw = f.read()
+                status_placeholder.markdown(f"**Converting {idx} / {total}:** {f.name}")
 
-            progress = st.progress(0, text="Starting…")
-            future = run_in_thread(image_format_converter, to_format, raw, max_width)
+                progress = st.progress(0, text="Starting…")
+                future = run_in_thread(
+                    image_format_converter, to_format, raw, max_width
+                )
 
-            pct = 10
-            while not future.done():
-                pct = min(pct + 2, 95)
-                progress.progress(pct, text=f"Converting to {choice}…")
-                time.sleep(0.05)
+                pct = 10
+                while not future.done():
+                    pct = min(pct + 2, 95)
+                    progress.progress(pct, text=f"Converting to {choice}…")
+                    time.sleep(0.05)
 
-            try:
-                final_fmt, out_bytes, final_img = future.result()
-            except Exception as e:
-                # e.g., trying to convert an alpha image to JPEG (your converter raises)
+                try:
+                    final_fmt, out_bytes, final_img = future.result()
+                except Exception as e:
+                    progress.empty()
+                    st.error(f"Skipping **{f.name}**: {e}")
+                    continue
+
+                progress.progress(100, text="Done")
+                time.sleep(0.1)
                 progress.empty()
-                st.error(f"Skipping **{f.name}**: {e}")
-                continue
 
-            progress.progress(100, text="Done")
-            time.sleep(0.1)
-            progress.empty()
+                # Build preview
+                thumb = final_img.copy()
+                thumb.thumbnail((900, 900))
+                buf = BytesIO()
+                thumb.save(buf, format="PNG")
+                thumb_bytes = buf.getvalue()
 
-            # Build preview 
-            thumb = final_img.copy()
-            thumb.thumbnail((900, 900))
-            buf = BytesIO()
-            thumb.save(buf, format="PNG")
-            thumb_bytes = buf.getvalue()
+                # File naming + mime
+                base = f.name.rsplit(".", 1)[0]
+                ext = ext_map.get(final_fmt, final_fmt)
+                file_name = f"{base}.{ext}"
+                mime = mime_map.get(final_fmt, "application/octet-stream")
 
-            # File naming + mime
-            base = f.name.rsplit(".", 1)[0]
-            ext = ext_map.get(final_fmt, final_fmt)
-            file_name = f"{base}.{ext}"
-            mime = mime_map.get(final_fmt, "application/octet-stream")
-
-            st.session_state.image_results.append(
-                {
-                    "name": file_name,
-                    "bytes": out_bytes,
-                    "preview": thumb_bytes,
-                    "width": final_img.width,
-                    "height": final_img.height,
-                    "mime": mime,
-                }
-            )
-        status_placeholder.empty()
+                st.session_state.image_results.append(
+                    {
+                        "name": file_name,
+                        "bytes": out_bytes,
+                        "preview": thumb_bytes,
+                        "width": final_img.width,
+                        "height": final_img.height,
+                        "mime": mime,
+                    }
+                )
+            status_placeholder.empty()
 
     if files and not st.session_state.image_results:
         run_images()

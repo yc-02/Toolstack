@@ -1,13 +1,12 @@
 # image_format_converter_tool.py
 import io
-from typing import Tuple, Optional, Tuple as _Tuple
+from typing import Tuple, Tuple as _Tuple
 from PIL import Image, ImageOps
 import pillow_heif
 
 pillow_heif.register_heif_opener()
 
 _WRITABLE = {"PNG", "JPEG", "JPG", "WEBP", "HEIF"}
-_ALPHA_OK = {"PNG", "WEBP", "HEIF"}
 
 
 def _normalize_format(fmt: str) -> str:
@@ -35,12 +34,10 @@ def _flatten_on_bg(img: Image.Image, bg: _Tuple[int, int, int]) -> Image.Image:
     Keeps orientation already applied.
     """
     if img.mode in ("LA", "L"):
-        img = img.convert("RGBA")  # ensure alpha channel behaves consistently
+        img = img.convert("RGBA")
     elif img.mode == "P":
-        # paletted images may have transparency in info; RGBA normalizes it
         img = img.convert("RGBA")
     elif img.mode != "RGBA":
-        # e.g. CMYK with alpha is rare; convert to RGBA to normalize
         try:
             img = img.convert("RGBA")
         except Exception:
@@ -65,21 +62,9 @@ def image_format_converter(
         255,
         255,
         255,
-    ),  # background used only if needed
+    ),  # if needed
 ) -> Tuple[str, bytes, Image.Image]:
-    """
-    Convert input image bytes to the selected format.
 
-    - Transparency is preserved for PNG/WEBP/HEIF.
-    - For formats without alpha (e.g., JPEG), transparency is automatically flattened
-      onto `flatten_bg` (default white) instead of raising an error.
-    - If `max_width` > 0 and the image is wider than `max_width`, it is resized
-      proportionally using bicubic resampling.
-    - EXIF orientation is respected; EXIF and ICC are preserved when possible.
-
-    Returns:
-        (final_format: str, out_bytes: bytes, final_image: PIL.Image.Image)
-    """
     if not isinstance(raw_bytes, (bytes, bytearray)) or len(raw_bytes) == 0:
         raise ValueError("raw_bytes must be non-empty bytes.")
 
@@ -89,7 +74,7 @@ def image_format_converter(
     img = Image.open(io.BytesIO(raw_bytes))
     img = ImageOps.exif_transpose(img)
 
-    # Optional resize (keep aspect ratio)
+    # resize (keep aspect ratio)
     if max_width and img.width > max_width:
         new_height = int(round(img.height * (max_width / img.width)))
         img = img.resize((max_width, new_height), Image.BICUBIC)
@@ -121,7 +106,7 @@ def image_format_converter(
     elif out_format == "HEIF":
         save_kwargs.update(dict(format="HEIF", quality=90))
 
-    # Try to preserve metadata where supported
+    # Try to preserve metadata
     exif = img.info.get("exif")
     if exif:
         save_kwargs["exif"] = exif

@@ -13,10 +13,6 @@ from streamlit_image_coordinates import streamlit_image_coordinates
 
 
 def pick_color_section():
-    # session defaults
-    st.session_state.setdefault("pick_color_key", f"pick-color-uploader-{time.time()}")
-    st.session_state.setdefault("pick_color", None)  # will hold a single dict or None
-
     st.title("Click to pick a color")
 
     file = st.file_uploader(
