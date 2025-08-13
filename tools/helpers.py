@@ -11,9 +11,29 @@ def run_in_thread(fn, *args, **kwargs):
     return _executor.submit(fn, *args, **kwargs)
 
 
+# ----------- paths ----------
+def _repo_root_dir() -> str:
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+def _embedded_node_bin() -> str:
+    home = os.path.expanduser("~")
+    node_bin = os.path.join(
+        home, ".cache", "toolstack", "node-v20.14.0-linux-x64", "bin", "node"
+    )
+    return node_bin if os.path.exists(node_bin) else "node"  # ← use embedded if present
+
+
+def path_convert_mjs() -> str:
+    here = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(here, "png2svg_tool.mjs")
+
+
 # ---------------- Node imagetracer bridge ----------------
 def have_node() -> bool:
-    return shutil.which("node") is not None
+    # check either embedded node or system node
+    node = _embedded_node_bin()
+    return os.path.exists(node) or shutil.which("node") is not None
 
 
 def bytesio_with_name(raw: bytes, name: str) -> BytesIO:
@@ -21,16 +41,6 @@ def bytesio_with_name(raw: bytes, name: str) -> BytesIO:
     bio.name = name
     bio.seek(0)
     return bio
-
-
-def _repo_root_dir() -> str:
-    """Return the absolute path to the repo root where package.json lives."""
-    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-
-def path_convert_mjs() -> str:
-    here = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(here, "png2svg_tool.mjs")
 
 
 def trace_with_imagetracer_node(
@@ -49,6 +59,12 @@ def trace_with_imagetracer_node(
     mjs = path_convert_mjs()
     if not os.path.exists(mjs):
         raise FileNotFoundError(f"png2svg_tool.mjs not found at {mjs}")
+
+    if not have_node():
+        raise EnvironmentError(
+            "Node.js not available (embedded and system node not found)."
+        )
+
     with tempfile.TemporaryDirectory() as td:
         inp = os.path.join(td, "in.png")
         out = os.path.join(td, "out.svg")
@@ -56,12 +72,12 @@ def trace_with_imagetracer_node(
             f.write(raw_bytes)
 
         args = [
-            "node",
+            _embedded_node_bin(),  
             mjs,
             inp,
             out,
             f"--mode={mode}",
-            f"--layers={int(max(2,layers))}",
+            f"--layers={int(max(2, layers))}",
         ]
         if upscale and int(upscale) > 1:
             args.append(f"--upscale={int(upscale)}")
@@ -78,11 +94,22 @@ def trace_with_imagetracer_node(
         if palette_hex_csv:
             args.append(f"--palette={palette_hex_csv}")
 
-        res = subprocess.run(args, cwd=_repo_root_dir(), capture_output=True, text=True)
+        res = subprocess.run(
+            args,
+            cwd=_repo_root_dir(),  # run from repo root 
+            capture_output=True,
+            text=True,
+        )
         if res.returncode != 0:
-            raise RuntimeError(f"imagetracer failed:\n{res.stdout}\n{res.stderr}")
+            import sys
 
-        return open(out, "rb").read()
+            print("[png2svg ERROR] CMD:", " ".join(args), file=sys.stderr)
+            print("[png2svg ERROR] STDOUT:\n", res.stdout, file=sys.stderr)
+            print("[png2svg ERROR] STDERR:\n", res.stderr, file=sys.stderr)
+            raise RuntimeError("imagetracer failed")
+
+        with open(out, "rb") as f:
+            return f.read()
 
 
 def embed_svg(svg_bytes: bytes):

@@ -2,6 +2,9 @@
   "name": "toolstack",
   "type": "module",
   "private": true,
+  "engines": {
+    "node": ">=18.17"
+  },
   "dependencies": {
     "imagetracerjs": "^1.2.6",
     "sharp": "^0.34.3",

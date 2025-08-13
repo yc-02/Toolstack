@@ -29,7 +29,7 @@ def pick_color_section():
         st.session_state["pick_color_key"] = f"pick-color-uploader-{time.time()}"
         st.rerun()
 
-    if not has_file:
+    if not file:
         return
 
     st.info("Click the image to pick a color")

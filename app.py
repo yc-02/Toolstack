@@ -1,50 +1,52 @@
 # app.py
-import os
-import shutil
-import subprocess
-import streamlit as st
+import os, subprocess, tarfile, urllib.request, stat, streamlit as st
 
 st.set_page_config(page_title="Toolstack", page_icon="favicon.ico", layout="wide")
 
-NODE_PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
-PKG_JSON = os.path.join(NODE_PROJECT_DIR, "package.json")
-PKG_LOCK = os.path.join(NODE_PROJECT_DIR, "package-lock.json")
-NODE_MODULES = os.path.join(NODE_PROJECT_DIR, "node_modules")
+NODE_VER = "v20.14.0"
+NODE_DIST = f"node-{NODE_VER}-linux-x64"
+CACHE_DIR = os.path.join(os.path.expanduser("~"), ".cache", "toolstack")
+NODE_DIR = os.path.join(CACHE_DIR, NODE_DIST)
+NODE_BIN = os.path.join(NODE_DIR, "bin", "node")
+NPM_BIN = os.path.join(NODE_DIR, "bin", "npm")
 
 
-def ensure_node_deps() -> bool:
-    if shutil.which("node") is None or shutil.which("npm") is None:
-        st.error(
-            "Node.js/npm are not available."
-        )
-        return False
+def ensure_embedded_node():
+    os.makedirs(CACHE_DIR, exist_ok=True)
+    if not os.path.exists(NODE_BIN):
+        url = f"https://nodejs.org/dist/{NODE_VER}/{NODE_DIST}.tar.xz"
+        tar_path = os.path.join(CACHE_DIR, f"{NODE_DIST}.tar.xz")
+        st.write(f"Downloading Node {NODE_VER}…")
+        urllib.request.urlretrieve(url, tar_path)
+        with tarfile.open(tar_path, "r:xz") as tf:
+            tf.extractall(CACHE_DIR)
+        # mark binaries executable
+        os.chmod(NODE_BIN, os.stat(NODE_BIN).st_mode | stat.S_IXUSR)
+        os.chmod(NPM_BIN, os.stat(NPM_BIN).st_mode | stat.S_IXUSR)
 
-    if not os.path.exists(PKG_JSON):
-        st.error(f"`package.json` not found at: {PKG_JSON}")
-        return False
 
-
-    need_install = (not os.path.isdir(NODE_MODULES)) or (not os.listdir(NODE_MODULES))
+def ensure_node_deps():
+    ensure_embedded_node()
+    repo_root = os.path.dirname(os.path.abspath(__file__))
+    pkg_json = os.path.join(repo_root, "package.json")
+    node_modules = os.path.join(repo_root, "node_modules")
+    if not os.path.exists(pkg_json):
+        st.error(f"`package.json` not found at: {pkg_json}")
+        st.stop()
+    need_install = (not os.path.isdir(node_modules)) or (not os.listdir(node_modules))
     if need_install:
         with st.status("Installing Node dependencies…", expanded=True) as status:
-            try:
-                if os.path.exists(PKG_LOCK):
-                    cmd = ["npm", "ci", "--omit=dev"]
-                else:
-                    cmd = ["npm", "install", "--omit=dev"]
-                st.write("Running:", " ".join(cmd))
-                subprocess.run(cmd, cwd=NODE_PROJECT_DIR, check=True)
-                status.update(label="Node dependencies installed", state="complete")
-            except subprocess.CalledProcessError as e:
-                st.error("Failed to install Node packages. Check app logs for details.")
-                print("[npm-install ERROR]", e)
-                return False
-    return True
+            cmd = (
+                [NPM_BIN, "ci", "--omit=dev"]
+                if os.path.exists(os.path.join(repo_root, "package-lock.json"))
+                else [NPM_BIN, "install", "--omit=dev"]
+            )
+            st.write("Running:", " ".join(cmd))
+            subprocess.run(cmd, cwd=repo_root, check=True)
+            status.update(label="Node dependencies installed", state="complete")
 
 
-if not ensure_node_deps():
-    st.stop()
-
+ensure_node_deps()
 
 from components.session import sessions
 from components.sidebar import sidebar
