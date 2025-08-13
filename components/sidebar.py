@@ -25,7 +25,6 @@ def sidebar():
 
     # ---- Images -----
     st.sidebar.title("Images")
-
     st.sidebar.button(
         "Image Format Converter",
         use_container_width=True,
@@ -34,14 +33,14 @@ def sidebar():
     )
 
     st.sidebar.button(
-        "PNG → SVG", use_container_width=True, on_click=set_tool, args=("PNG → SVG",)
+        "PNG to SVG", use_container_width=True, on_click=set_tool, args=("PNG to SVG",)
     )
 
     st.sidebar.button(
-        "Click-to-pick color",
+        "Click to Pick Color",
         use_container_width=True,
         on_click=set_tool,
-        args=("Click-to-pick color",),
+        args=("Click to Pick Color",),
     )
 
     st.sidebar.button(

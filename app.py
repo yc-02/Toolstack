@@ -9,7 +9,7 @@ from components.pick_color_section import pick_color_section
 from components.data_format_converter_section import data_format_converter_section
 from components.extract_pdf_tables_section import extract_pdf_tables_section
 
-st.set_page_config(page_title="Toolstack", page_icon="", layout="wide")
+st.set_page_config(page_title="Toolstack", page_icon="favicon.ico", layout="wide")
 sessions()
 sidebar()
 
@@ -20,7 +20,7 @@ if tool == "intro":
         "### Welcome!\n"
         "Pick a tool from the **sidebar** on the left to get started.\n"
     )
-    st.info("➡️ Use the left panel to explore available tools.")
+    st.info("Use the left panel to explore available tools.")
 
 
 elif tool == "Image Format Converter":
@@ -29,10 +29,10 @@ elif tool == "Image Format Converter":
 elif tool == "Background Remover":
     bg_remover_section()
 
-elif tool == "PNG → SVG":
+elif tool == "PNG to SVG":
     png2svg_section()
 
-elif tool == "Click-to-pick color":
+elif tool == "Click to Pick Color":
     pick_color_section()
 
 elif tool == "Data Format Converter":

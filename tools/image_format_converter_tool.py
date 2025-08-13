@@ -6,7 +6,7 @@ import pillow_heif
 
 pillow_heif.register_heif_opener()
 
-_WRITABLE = {"PNG", "JPEG", "JPG", "WEBP", "HEIF"}
+_WRITABLE = {"PNG", "JPEG", "JPG", "WEBP", "HEIF","ICO"}
 
 
 def _normalize_format(fmt: str) -> str:
@@ -105,6 +105,8 @@ def image_format_converter(
 
     elif out_format == "HEIF":
         save_kwargs.update(dict(format="HEIF", quality=90))
+    elif out_format =="ICO":
+        save_kwargs.update(dict(format="ICO", sizes=[(16, 16), (32, 32), (48, 48)]))
 
     # Try to preserve metadata
     exif = img.info.get("exif")

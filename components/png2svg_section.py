@@ -26,20 +26,72 @@ def png2svg_section():
 
     # Options
     colA, colB, colC = st.columns(3)
+
     with colA:
-        mode = st.selectbox("Style", ["fidelity", "poster"], index=0)
-        layers = st.slider("Layers (colors)", 2, 20, 8)
-        dropwhite = st.checkbox("Drop white layer", value=False)
-    with colB:
-        preblur = st.slider("Pre-blur (smooth regions)", 0.0, 1.5, 0.0, 0.1)
-        median = st.slider("Median denoise", 0, 3, 0)
-        mergecolors = st.slider(
-            "Merge similar colors (ΔRGB)", 0, 48, 0, help="Reduce near-duplicate fills"
+        mode = st.selectbox(
+            "Style",
+            ["fidelity", "poster"],
+            index=0,
+            help=(
+                "• Fidelity – preserves detail and keeps more shapes.\n"
+                "• Poster – flattens shapes into fewer solid areas."
+            ),
         )
+        layers = st.slider(
+            "Layers (colors)",
+            2,
+            20,
+            8,
+            help="Maximum number of color layers to detect in the image.",
+        )
+        dropwhite = st.checkbox(
+            "Drop white layer",
+            value=False,
+            help="Remove any large white background layer from the output.",
+        )
+
+    with colB:
+        preblur = st.slider(
+            "Pre-blur (smooth regions)",
+            0.0,
+            1.5,
+            0.0,
+            0.1,
+            help="Blur the image slightly before tracing to merge small details.",
+        )
+        median = st.slider(
+            "Median denoise",
+            0,
+            3,
+            0,
+            help="Reduce random noise by applying a median filter before tracing.",
+        )
+        mergecolors = st.slider(
+            "Merge similar colors (ΔRGB)",
+            0,
+            48,
+            0,
+            help="Merge areas whose colors differ by less than the given RGB distance.",
+        )
+
     with colC:
-        upscale = st.slider("Upscale before trace (×)", 1, 3, 1)
-        svgo = st.checkbox("Optimize with SVGO", value=True)
-        custom_palette = st.text_input("Fixed palette (comma hex)", value="")
+        upscale = st.slider(
+            "Upscale before trace (×)",
+            1,
+            3,
+            1,
+            help="Enlarge the image before tracing to capture more detail.",
+        )
+        svgo = st.checkbox(
+            "Optimize with SVGO",
+            value=True,
+            help="Run the traced SVG through SVGO to reduce file size.",
+        )
+        custom_palette = st.text_input(
+            "Fixed palette (comma hex)",
+            value="",
+            help="Optional: supply a fixed set of colors (hex codes, comma-separated) to limit the palette.",
+        )
 
     files = st.file_uploader(
         "Choose images",
@@ -107,16 +159,23 @@ def png2svg_section():
                     progress.progress(pct, text="Tracing shapes…")
                     time.sleep(0.05)
 
-                svg_bytes = future.result()
-                progress.progress(100, text="Done ")
+                # Collect result safely
+                try:
+                    svg_bytes = future.result()
+                except Exception:
+                    progress.empty()
+                    st.warning(
+                        f"⚠️ Something went wrong for **{f.name}** — clear and try again."
+                    )
+                    continue
+
+                progress.progress(100, text="Done")
                 time.sleep(0.1)
                 progress.empty()
-
                 out_name = f.name.rsplit(".", 1)[0] + ".svg"
                 st.session_state.svg_results.append(
                     {"name": out_name, "svg": svg_bytes}
                 )
-
             status_placeholder.empty()
 
     if files and not st.session_state.svg_results:

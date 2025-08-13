@@ -21,7 +21,13 @@ def image_format_converter_section():
     st.title("Image Format Converter")
 
     # --- Output format selection
-    label_to_fmt = {"PNG": "png", "JPEG": "jpeg", "WEBP": "webp", "HEIF": "heif"}
+    label_to_fmt = {
+        "PNG": "png",
+        "JPEG": "jpeg",
+        "WEBP": "webp",
+        "HEIF": "heif",
+        "ICO": "ico",  # added favicon/ICO option
+    }
     choice = st.selectbox("Convert to format", list(label_to_fmt.keys()), index=0)
     to_format = label_to_fmt[choice]
 
@@ -62,12 +68,19 @@ def image_format_converter_section():
         )
 
     # helpers to map formats to extensions/mimes
-    ext_map = {"png": "png", "jpeg": "jpg", "webp": "webp", "heif": "heic"}
+    ext_map = {
+        "png": "png",
+        "jpeg": "jpg",
+        "webp": "webp",
+        "heif": "heic",
+        "ico": "ico",
+    }
     mime_map = {
         "png": "image/png",
         "jpeg": "image/jpeg",
         "webp": "image/webp",
         "heif": "image/heif",
+        "ico": "image/x-icon",
     }
 
     # clear
@@ -145,7 +158,11 @@ def image_format_converter_section():
             col1, col2 = st.columns([4, 1])
             with col1:
                 st.subheader(f"{i}. {r['name']}")
-                st.caption(f"{r['width']} × {r['height']} px")
+                if choice == "ICO":
+                    st.caption(f"Preview")
+                else:
+                    st.caption(f"Preview ({r['width']} × {r['height']} px)")
+
             with col2:
                 st.download_button(
                     "⬇ Download",
@@ -155,4 +172,4 @@ def image_format_converter_section():
                     key=f"dl-image-{i}-{r['name']}",
                     use_container_width=True,
                 )
-            st.image(r["preview"], use_container_width=True)
+            st.image(r["preview"], width=300)

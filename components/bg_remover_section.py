@@ -116,7 +116,7 @@ def bg_remover_section():
             col1, col2 = st.columns([4, 1])
             with col1:
                 st.subheader(f"{i}. {r['name']}")
-                st.caption(f"{r['width']} × {r['height']} px")
+                st.caption(f"Preview ({r['width']} × {r['height']} px)")
             with col2:
                 st.download_button(
                     "⬇ Download",
@@ -126,4 +126,4 @@ def bg_remover_section():
                     key=f"dl-cut-{i}-{r['name']}",
                     use_container_width=True,
                 )
-            st.image(r["preview"], use_container_width=True)
+            st.image(r["preview"], width=300)

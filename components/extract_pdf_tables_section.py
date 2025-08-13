@@ -110,7 +110,7 @@ def extract_pdf_tables_section():
         for i, r in enumerate(st.session_state.pdf_table_results, start=1):
             c1, c2 = st.columns([4, 1])
             with c1:
-                st.subheader(f"{i}. {r['name']}")
+                st.write(f"{i}. {r['name']}")
                 st.caption(f"Preview")
             with c2:
                 st.download_button(

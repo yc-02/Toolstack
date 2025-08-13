@@ -25,7 +25,7 @@ def bytesio_with_name(raw: bytes, name: str) -> BytesIO:
 
 def path_convert_mjs() -> str:
     here = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(here, "tools/png2svg_tool.mjs")
+    return os.path.join(here, "png2svg_tool.mjs")
 
 
 def trace_with_imagetracer_node(
@@ -43,7 +43,7 @@ def trace_with_imagetracer_node(
 ) -> bytes:
     mjs = path_convert_mjs()
     if not os.path.exists(mjs):
-        raise FileNotFoundError(f"convert.mjs not found at {mjs}")
+        raise FileNotFoundError(f"png2svg_tool.mjs not found at {mjs}")
     with tempfile.TemporaryDirectory() as td:
         inp = os.path.join(td, "in.png")
         out = os.path.join(td, "out.svg")
