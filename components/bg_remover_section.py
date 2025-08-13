@@ -4,7 +4,7 @@ from io import BytesIO
 from tools.remove_bg_tool import remove_bg, get_session
 
 try:
-    from helpers import run_in_thread
+    from tools.helpers import run_in_thread
 except Exception:
     import concurrent.futures
 
@@ -41,14 +41,20 @@ def bg_remover_section():
 
     has_files = bool(files)
     has_results = bool(st.session_state["bg_results"])
-    col1, col2, _ = st.columns([1, 2, 7])
+    col1, col2, _spacer = st.columns([1, 2, 7])
     with col1:
-        rerun_clicked = st.button("Run Again", key="rerun-bg", disabled=not (has_files))
+        rerun_clicked = st.button(
+            "Run Again",
+            key="rerun-bg",
+            disabled=not (has_files),
+            use_container_width=True,
+        )
     with col2:
         clear_clicked = st.button(
             "Clear uploads/results",
             key="clear-bg",
             disabled=not (has_files or has_results),
+            use_container_width=True,
         )
 
     def clear_bg():
@@ -98,9 +104,9 @@ def bg_remover_section():
                 )
             status_placeholder.empty()
 
-    if files and not st.session_state.bg_results:
+    if has_files and not st.session_state.bg_results:
         run_bg()
-    if files and rerun_clicked:
+    if has_files and rerun_clicked:
         st.session_state["bg_results"] = []
         run_bg()
     if clear_clicked:

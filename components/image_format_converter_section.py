@@ -7,7 +7,7 @@ from tools.image_format_converter_tool import (
 )
 
 try:
-    from helpers import run_in_thread
+    from tools.helpers import run_in_thread
 except Exception:
     import concurrent.futures
 

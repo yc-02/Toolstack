@@ -1,5 +1,6 @@
-#sidebar.py
+# sidebar.py
 import streamlit as st
+
 
 def sidebar():
     st.sidebar.title("Images")
@@ -14,12 +15,7 @@ def sidebar():
         on_click=set_tool,
         args=("Image Format Converter",),
     )
-    st.sidebar.button(
-        "Background Remover",
-        use_container_width=True,
-        on_click=set_tool,
-        args=("Background Remover",),
-    )
+
     st.sidebar.button(
         "PNG → SVG", use_container_width=True, on_click=set_tool, args=("PNG → SVG",)
     )
@@ -29,6 +25,13 @@ def sidebar():
         use_container_width=True,
         on_click=set_tool,
         args=("Click-to-pick color",),
+    )
+
+    st.sidebar.button(
+        "Background Remover",
+        use_container_width=True,
+        on_click=set_tool,
+        args=("Background Remover",),
     )
 
     st.sidebar.title("Files")

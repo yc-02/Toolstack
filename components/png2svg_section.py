@@ -3,7 +3,7 @@ import time
 import streamlit as st
 
 try:
-    from helpers import run_in_thread, embed_svg, trace_with_imagetracer_node, have_node
+    from tools.helpers import run_in_thread, embed_svg, trace_with_imagetracer_node, have_node
 except Exception:
     import concurrent.futures
 

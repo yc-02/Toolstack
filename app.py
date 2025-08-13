@@ -5,7 +5,7 @@ from components.sidebar import sidebar
 from components.image_format_converter_section import image_format_converter_section
 from components.bg_remover_section import bg_remover_section
 from components.png2svg_section import png2svg_section
-
+from components.pick_color_section import pick_color_section
 
 st.set_page_config(page_title="Toolstack", page_icon="", layout="wide")
 sessions()
@@ -28,6 +28,8 @@ elif tool == "Background Remover":
 elif tool == "PNG → SVG":
     png2svg_section()
 
+elif tool == "Click-to-pick color":
+    pick_color_section()
 
 elif tool == "File Converter":
     st.title("File Converter (coming soon)")
