@@ -1,17 +1,5 @@
 #!/usr/bin/env node
-// convert.mjs
-// Turn a bitmap into a stylized SVG using sharp + imagetracerjs (+ optional SVGO).
-//
-// Usage examples:
-//   node convert.mjs input.png output.svg --mode=fidelity --layers=14 --svgo
-//   node convert.mjs input.png output.svg --mode=poster --layers=5 --preblur=0.6 --mergecolors=16 --svgo
-//   node convert.mjs input.png output.svg --palette=#000000,#7d7e80,#ffffff --svgo
-//
-// One-time install (in your project):
-//   npm i sharp imagetracerjs svgo
-//
-// If you see issues with SVGO not found by npx, also try:
-//   npm i -g svgo
+// png2svg_tool.mjs
 
 import fs from 'node:fs';
 import sharp from 'sharp';

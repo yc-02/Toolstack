@@ -1,5 +1,5 @@
+#sidebar.py
 import streamlit as st
-
 
 def sidebar():
     st.sidebar.title("Images")
@@ -8,7 +8,6 @@ def sidebar():
         st.session_state.tool = name
 
     # Image Format Converter
-    # Todo: HEIC ↔ JPG ↔ PNG ↔ WebP
     st.sidebar.button(
         "Image Format Converter",
         use_container_width=True,

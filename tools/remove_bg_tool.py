@@ -1,4 +1,4 @@
-# remove_bg_fast.py
+# remove_bg.py
 import io
 from typing import Tuple
 from PIL import Image, ImageOps, ImageFilter

@@ -16,7 +16,7 @@ def have_node() -> bool:
 
 def path_convert_mjs() -> str:
     here = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(here, "tools/convert.mjs")
+    return os.path.join(here, "tools/png2svg_tool.mjs")
 
 
 def trace_with_imagetracer_node(

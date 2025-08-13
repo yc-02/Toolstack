@@ -2,7 +2,7 @@
 import streamlit as st
 from components.session import sessions
 from components.sidebar import sidebar
-from components.heic2png_section import heic2png_section
+from components.image_format_converter_section import image_format_converter_section
 from components.bg_remover_section import bg_remover_section
 from components.png2svg_section import png2svg_section
 
@@ -16,9 +16,9 @@ if tool == "intro":
     st.title("Select a tool")
     st.info("Select a tool you want to use from the left panel")
 
-# HEIC → PNG
+#  Image format converter
 elif tool == "Image Format Converter":
-    heic2png_section()
+    image_format_converter_section()
 
 # Background Remover
 elif tool == "Background Remover":

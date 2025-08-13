@@ -1,3 +1,4 @@
+# png2svg_section.py
 import time
 import streamlit as st
 
@@ -44,63 +45,82 @@ def png2svg_section():
         key=st.session_state.svg_key,
     )
 
-    has_files = bool(files)  # list of UploadedFile when accept_multiple_files=True
+    has_files = bool(files)
     has_results = bool(st.session_state["svg_results"])
-    clicked = st.button(
-        "Clear uploads/results",
-        key="clear-svg",
-        disabled=not (has_files or has_results),
-    )
+    col1, col2, _ = st.columns([1, 2, 7])
+    with col1:
+        rerun_clicked = st.button(
+            "Run Again", key="rerun-svg", disabled=not (has_files)
+        )
+    with col2:
+        clear_clicked = st.button(
+            "Clear uploads/results",
+            key="clear-svg",
+            disabled=not (has_files or has_results),
+        )
 
-    if clicked:
+    def clear_svg():
         st.session_state["svg_results"] = []
         st.session_state["svg_key"] = (
             f"sbg-uploader-{time.time()}"  # reset uploader so files clear
         )
         st.rerun()
-        
-    if files and not st.session_state.svg_results:
-        total = len(files)
-        status_placeholder = st.empty()
 
-        for idx, f in enumerate(files, start=1):
-            raw = f.read()
-            status_placeholder.markdown(f"**Vectorizing {idx} / {total}:** {f.name}")
+    def run_svg():
+        if files:
+            total = len(files)
+            status_placeholder = st.empty()
 
-            progress = st.progress(0, text="Starting…")
-            if have_node():
-                future = run_in_thread(
-                    trace_with_imagetracer_node,
-                    raw,
-                    mode=mode,
-                    layers=layers,
-                    upscale=upscale,
-                    preblur=preblur,
-                    median=median,
-                    mergecolors=mergecolors,
-                    dropwhite=dropwhite,
-                    svgo=svgo,
-                    palette_hex_csv=(custom_palette.strip() or None),
+            for idx, f in enumerate(files, start=1):
+                raw = f.read()
+                status_placeholder.markdown(
+                    f"**Vectorizing {idx} / {total}:** {f.name}"
                 )
-            else:
-                st.error("Node.js not available; cannot run ImageTracer engine.")
-                break
 
-            pct = 10
-            while not future.done():
-                pct = min(pct + 2, 96)
-                progress.progress(pct, text="Tracing shapes…")
-                time.sleep(0.05)
+                progress = st.progress(0, text="Starting…")
+                if have_node():
+                    future = run_in_thread(
+                        trace_with_imagetracer_node,
+                        raw,
+                        mode=mode,
+                        layers=layers,
+                        upscale=upscale,
+                        preblur=preblur,
+                        median=median,
+                        mergecolors=mergecolors,
+                        dropwhite=dropwhite,
+                        svgo=svgo,
+                        palette_hex_csv=(custom_palette.strip() or None),
+                    )
+                else:
+                    st.error("Node.js not available; cannot run ImageTracer engine.")
+                    break
 
-            svg_bytes = future.result()
-            progress.progress(100, text="Done ✅")
-            time.sleep(0.1)
-            progress.empty()
+                pct = 10
+                while not future.done():
+                    pct = min(pct + 2, 96)
+                    progress.progress(pct, text="Tracing shapes…")
+                    time.sleep(0.05)
 
-            out_name = f.name.rsplit(".", 1)[0] + ".svg"
-            st.session_state.svg_results.append({"name": out_name, "svg": svg_bytes})
+                svg_bytes = future.result()
+                progress.progress(100, text="Done ")
+                time.sleep(0.1)
+                progress.empty()
 
-        status_placeholder.empty()
+                out_name = f.name.rsplit(".", 1)[0] + ".svg"
+                st.session_state.svg_results.append(
+                    {"name": out_name, "svg": svg_bytes}
+                )
+
+            status_placeholder.empty()
+
+    if files and not st.session_state.svg_results:
+        run_svg()
+    if files and rerun_clicked:
+        st.session_state["svg_results"] = []
+        run_svg()
+    if clear_clicked:
+        clear_svg()
 
     if st.session_state.svg_results:
         for i, r in enumerate(st.session_state.svg_results, start=1):
