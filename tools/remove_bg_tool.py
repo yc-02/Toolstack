@@ -1,4 +1,4 @@
-# remove_bg.py
+# remove_bg_tool.py
 import io
 from typing import Tuple
 from PIL import Image, ImageOps, ImageFilter
@@ -6,7 +6,6 @@ from rembg import remove as rembg_remove, new_session
 
 # cache sessions per (model_name)
 _sessions = {}
-
 
 def get_session(model_name: str = "u2net"):  # default to faster model
     if model_name not in _sessions:

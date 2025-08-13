@@ -1,9 +1,6 @@
 import io
 from PIL import Image, ImageCms
 
-
-
-
 def to_srgb(img: Image.Image) -> Image.Image:
     try:
         icc = img.info.get("icc_profile")

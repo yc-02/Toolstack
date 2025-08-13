@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-// png2svg_tool.mjs
 
 import fs from 'node:fs';
 import sharp from 'sharp';
