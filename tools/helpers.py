@@ -23,6 +23,11 @@ def bytesio_with_name(raw: bytes, name: str) -> BytesIO:
     return bio
 
 
+def _repo_root_dir() -> str:
+    """Return the absolute path to the repo root where package.json lives."""
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
 def path_convert_mjs() -> str:
     here = os.path.dirname(os.path.abspath(__file__))
     return os.path.join(here, "png2svg_tool.mjs")
@@ -73,7 +78,7 @@ def trace_with_imagetracer_node(
         if palette_hex_csv:
             args.append(f"--palette={palette_hex_csv}")
 
-        res = subprocess.run(args, capture_output=True, text=True)
+        res = subprocess.run(args, cwd=_repo_root_dir(), capture_output=True, text=True)
         if res.returncode != 0:
             raise RuntimeError(f"imagetracer failed:\n{res.stdout}\n{res.stderr}")
 
